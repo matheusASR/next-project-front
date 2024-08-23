@@ -13,15 +13,12 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import EditProfile from "@/components/EditProfile";
+import Profile from "@/components/Profile";
 import { api } from "@/services/api";
 import { useRouter } from "next/navigation";
-
-const navigation = [
-  { name: "Collections", href: "#", current: true },
-  { name: "My List", href: "#", current: false },
-  { name: "Profile", href: "#", current: false },
-];
+import CollectionForm from "@/components/CollectionForm";
+import ProductForm from "@/components/ProductForm";
+import { toast } from "sonner";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -40,10 +37,17 @@ function getInitials({
 }
 
 export default function Dashboard() {
+  const router = useRouter();
   const [selectedNav, setSelectedNav] = useState("Collections");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<any>({});
-  const router = useRouter();
+  const [creationType, setCreationType] = useState("Product");
+
+  const handleCreationTypeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setCreationType(event.target.value);
+  };
 
   useEffect(() => {
     const token = sessionStorage.getItem("@next-project:TOKEN");
@@ -55,6 +59,7 @@ export default function Dashboard() {
           },
         });
         if (response.status === 200) {
+          console.log(response.data)
           setUser(response.data);
         }
       } catch (error: any) {
@@ -70,8 +75,25 @@ export default function Dashboard() {
     }
   }, [router]);
 
+  const navigation = user.admin
+    ? [
+        { name: "Collections", href: "#", current: true },
+        { name: "Admin", href: "#", current: false },
+      ]
+    : [
+        { name: "Collections", href: "#", current: true },
+        { name: "My List", href: "#", current: false },
+        { name: "Profile", href: "#", current: false },
+      ];
+
   const handleSignOutClick = () => {
     setIsModalOpen(true);
+  };
+
+  const signOut = () => {
+    toast.success("Usuário deslogado com sucesso!");
+    sessionStorage.removeItem("@next-project:TOKEN");
+    router.push("/");
   };
 
   return (
@@ -210,8 +232,32 @@ export default function Dashboard() {
 
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {selectedNav === "Collections" && <ProductsCollection />}
-          {selectedNav === "My List" && <ProductsMyList />}
-          {selectedNav === "Profile" && <EditProfile user={user} setUser={setUser} />}
+          {selectedNav === "My List" && <ProductsMyList user={user} />}
+          {selectedNav === "Profile" && (
+            <Profile user={user} setUser={setUser} />
+          )}
+          {selectedNav === "Admin" && (
+            <>
+              <label
+                htmlFor="creation"
+                className="text-base font-semibold leading-7 text-gray-900"
+              >
+                Creation Type
+              </label>
+              <select
+                id="creation"
+                name="creation"
+                value={creationType}
+                onChange={handleCreationTypeChange}
+                className="mt-2 mb-5 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              >
+                <option value="Product">Product</option>
+                <option value="Collection">Collection</option>
+              </select>
+              {creationType === "Collection" && <CollectionForm />}
+              {creationType === "Product" && <ProductForm />}
+            </>
+          )}
         </div>
 
         {/* Renderiza o AlertModal se o isModalOpen for true */}
@@ -219,6 +265,10 @@ export default function Dashboard() {
           <AlertModal
             open={isModalOpen}
             onClose={() => setIsModalOpen(false)}
+            onConfirm={signOut}
+            title="Are you sure?"
+            description="Are you sure you want to sign out from your account?"
+            confirmText="Yes, sign out"
           />
         )}
       </div>

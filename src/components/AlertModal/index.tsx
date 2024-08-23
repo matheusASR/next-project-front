@@ -10,17 +10,8 @@ import {
   ExclamationTriangleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
-export default function AlertModal({ open, onClose }: any) {
-  const router = useRouter();
-  const signOut = () => {
-    toast.success("Usuário deslogado com sucesso!");
-    sessionStorage.removeItem("@next-project:TOKEN");
-    router.push("/");
-  };
-
+export default function AlertModal({ open, onClose, onConfirm, title, description, confirmText }: any) {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-10">
       <DialogBackdrop
@@ -56,11 +47,11 @@ export default function AlertModal({ open, onClose }: any) {
                   as="h3"
                   className="text-base font-semibold leading-6 text-gray-900"
                 >
-                  Sign out
+                  {title}
                 </DialogTitle>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Are you sure you want to sign out from your account?
+                    {description}
                   </p>
                 </div>
               </div>
@@ -68,10 +59,10 @@ export default function AlertModal({ open, onClose }: any) {
             <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
               <button
                 type="button"
-                onClick={() => signOut()}
+                onClick={onConfirm}
                 className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
               >
-                Sign out
+                {confirmText}
               </button>
               <button
                 type="button"
