@@ -1,46 +1,80 @@
-const products = [
-  {
-    id: 1,
-    name: "Leather Long Wallet",
-    href: "/product",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/home-page-04-trending-product-02.jpg",
-    imageAlt: "Hand stitched, orange leather long wallet.",
-  },
-  {
-    id: 2,
-    name: "Focus Card Holder",
-    href: "/product",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-01-image-card-02.jpg",
-    imageAlt: "Paper card sitting upright in walnut card holder on desk.",
-  },
-  // More products...
-];
+"use client";
 
-export default function ProductsList() {
+import { toast } from "sonner";
+import EmptyState from "../EmptyState";
+import { api } from "@/services/api";
+// @ts-ignore
+import { CheckCircleIcon } from '@heroicons/react/solid';
+
+export default function ProductsList({ user, collectionId, products }: any) {
+  const addToList = async (productId: number) => {
+    // setLoading(true);
+    try {
+      const response = await api.post(`/users/${user.id}/${productId}`);
+      if (response.statusText === "OK") {
+        toast.success("Produto adicionado à sua lista!");
+      }
+    } catch (error: any) {
+      toast.error(`Erro ao adicionar produto: ${error.response.data.message}`);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
   return (
     <div>
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-0 lg:gap-x-8">
-          {products.map((product) => (
-            <div key={product.id} className="group relative">
-              <div className="h-56 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-72 xl:h-80">
-                <img
-                  alt={product.imageAlt}
-                  src={product.imageSrc}
-                  className="h-full w-full object-cover object-center"
-                />
-              </div>
-              <h3 className="mt-4 text-sm text-gray-700">
-                <a href={product.href}>
-                  <span className="absolute inset-0" />
-                  {product.name}
-                </a>
-              </h3>
-            </div>
-          ))}
-        </div>
+        {products && products.length > 0 ? (
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+            {products.map((product: any) => {
+              const isProductInUserList = user.products?.some(
+                (userProduct: any) => userProduct.id === product.id
+              );
+
+              return (
+                <div key={product.id}>
+                  <a
+                    href={`/dashboard/collection-${collectionId}/product-${product.id}`}
+                    className="group"
+                  >
+                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                      <img
+                        // alt={product.imageAlt}
+                        src={product.coverImage}
+                        className="h-full w-full object-cover object-center group-hover:opacity-75"
+                      />
+                    </div>
+                    <h3 className="mt-4 text-sm text-gray-700">
+                      {product.name}
+                    </h3>
+                  </a>
+                  {isProductInUserList ? (
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    >
+                      <CheckCircleIcon
+                        aria-hidden="true"
+                        className="-ml-0.5 h-5 w-5"
+                      />
+                      Added
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => addToList(product.id)}
+                      className="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100"
+                    >
+                      Add My List
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState />
+        )}
       </div>
     </div>
   );
