@@ -3,14 +3,13 @@
 import { toast } from "sonner";
 import EmptyState from "../EmptyState";
 import { api } from "@/services/api";
-// @ts-ignore
-import { CheckCircleIcon } from '@heroicons/react/solid';
 
 export default function ProductsList({ user, collectionId, products }: any) {
   const addToList = async (productId: number) => {
+    console.log(productId)
     // setLoading(true);
     try {
-      const response = await api.post(`/users/${user.id}/${productId}`);
+      const response = await api.post(`/userProducts/${user.id}/${productId}`);
       if (response.statusText === "OK") {
         toast.success("Produto adicionado à sua lista!");
       }
@@ -44,7 +43,7 @@ export default function ProductsList({ user, collectionId, products }: any) {
                         className="h-full w-full object-cover object-center group-hover:opacity-75"
                       />
                     </div>
-                    <h3 className="mt-4 text-sm text-gray-700">
+                    <h3 className="mt-4 mb-3 text-base text-gray-800">
                       {product.name}
                     </h3>
                   </a>
@@ -53,10 +52,7 @@ export default function ProductsList({ user, collectionId, products }: any) {
                       type="button"
                       className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                      <CheckCircleIcon
-                        aria-hidden="true"
-                        className="-ml-0.5 h-5 w-5"
-                      />
+                      
                       Added
                     </button>
                   ) : (

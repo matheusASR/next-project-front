@@ -2,13 +2,31 @@
 
 import { useEffect, useState } from "react";
 import EmptyState from "../EmptyState";
+import { toast } from "sonner";
+import { api } from "@/services/api";
 
 export default function ProductsMyList({ user }: any) {
   const [products, setProducts] = useState<any>([]);
 
   useEffect(() => {
-    setProducts(user.myList);
-  }, [user.myList]);
+    setProducts(user.products);
+    console.log(user.products)
+  }, [user.products]);
+
+  const removeFromList = async (productId: number) => {
+    console.log(productId)
+    // setLoading(true);
+    try {
+      const response = await api.delete(`/userProducts/${user.id}/${productId}`);
+      if (response.statusText === "OK") {
+        toast.success("Produto removido de sua lista!");
+      }
+    } catch (error: any) {
+      toast.error(`Erro ao remover produto: ${error.response.data.message}`);
+    } finally {
+      // setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -16,20 +34,29 @@ export default function ProductsMyList({ user }: any) {
         {products && products.length > 0 ? (
           <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-0 lg:gap-x-8">
             {products.map((product: any) => (
-              <div key={product.id} className="group relative">
-                <div className="h-56 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-72 xl:h-80">
-                  <img
-                    // alt={product.imageAlt}
-                    src={product.coverImage}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </div>
-                <h3 className="mt-4 text-sm text-gray-700">
-                  <a href="#">
-                    <span className="absolute inset-0" />
+              <div key={product.id}>
+                <a
+                  href={`/dashboard/collection-${product.collection.id}/product-${product.id}`}
+                  className="group"
+                >
+                  <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                    <img
+                      // alt={product.imageAlt}
+                      src={product.coverImage}
+                      className="h-full w-full object-cover object-center group-hover:opacity-75"
+                    />
+                  </div>
+                  <h3 className="mt-4 mb-3 text-base text-gray-800">
                     {product.name}
-                  </a>
-                </h3>
+                  </h3>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => removeFromList(product.id)}
+                  className="rounded-md bg-indigo-50 px-2.5 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm hover:bg-indigo-100"
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>

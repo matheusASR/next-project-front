@@ -4,12 +4,12 @@ import EmptyState from "@/components/EmptyState";
 
 export default function ProductsCollection({ collections }: any) {
   return (
-    <div>
+    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
       {collections && collections.length > 0 ? (
         collections.map((collection: any, index: number) => (
           <div
             key={index}
-            className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl"
+            // className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl"
           >
             <div className="relative overflow-hidden rounded-lg lg:h-96">
               <div className="absolute inset-0">
