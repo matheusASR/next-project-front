@@ -3,6 +3,7 @@
 import HeaderSection from "@/components/HeaderSection";
 import Loading from "@/components/Loading";
 import ProductsList from "@/components/ProductsList";
+import ProductsListAdmin from "@/components/ProductsListAdmin";
 import { api } from "@/services/api";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -86,11 +87,23 @@ export default function CollectionPage() {
             title={collection.name}
             description={collection.description}
           />
-          <ProductsList
-            user={user}
-            collectionId={cleanCollectionId}
-            products={collection.products}
-          />
+          {user.admin ? (
+            <>
+              <ProductsListAdmin
+                collectionId={cleanCollectionId}
+                products={collection.products}
+              />
+            </>
+          ) : (
+            <>
+              <ProductsList
+                user={user}
+                setUser={setUser}
+                collectionId={cleanCollectionId}
+                products={collection.products}
+              />
+            </>
+          )}
         </>
       )}
     </>

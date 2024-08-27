@@ -21,6 +21,8 @@ import ProductForm from "@/components/ProductForm";
 import { toast } from "sonner";
 import Loading from "@/components/Loading";
 import ProductView from "@/components/ProductView";
+import DeleteCollection from "@/components/DeleteCollection";
+import DeleteProduct from "@/components/DeleteProduct";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -44,6 +46,7 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<any>({});
   const [creationType, setCreationType] = useState("Product");
+  const [products, setProducts] = useState<any>([]);
   const [collections, setCollections] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -97,8 +100,25 @@ export default function Dashboard() {
       }
     };
 
+    const getProducts = async () => {
+      try {
+        const response = await api.get("/products", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.status === 200) {
+          console.log(response.data);
+          setProducts(response.data);
+        }
+      } catch (error: any) {
+        console.error("Failed to get products", error);
+      }
+    };
+
     if (token) {
       getCollections();
+      getProducts();
     }
 
     const timer = setTimeout(() => {
@@ -114,13 +134,13 @@ export default function Dashboard() {
 
   const navigation = user.admin
     ? [
-        { name: "Collections", href: "#", current: true },
-        { name: "Admin", href: "#", current: false },
+        { name: "Collections", current: true },
+        { name: "Admin", current: false },
       ]
     : [
-        { name: "Collections", href: "#", current: true },
-        { name: "My List", href: "#", current: false },
-        { name: "Profile", href: "#", current: false },
+        { name: "Collections", current: true },
+        { name: "My List", current: false },
+        { name: "Profile", current: false },
       ];
 
   const handleSignOutClick = () => {
@@ -153,9 +173,8 @@ export default function Dashboard() {
                   <div className="hidden md:block">
                     <div className="ml-10 flex items-baseline space-x-4">
                       {navigation.map((item) => (
-                        <a
+                        <button
                           key={item.name}
-                          href={item.href}
                           aria-current={item.current ? "page" : undefined}
                           onClick={() => setSelectedNav(item.name)}
                           className={classNames(
@@ -166,7 +185,7 @@ export default function Dashboard() {
                           )}
                         >
                           {item.name}
-                        </a>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -226,7 +245,6 @@ export default function Dashboard() {
                   <DisclosureButton
                     key={item.name}
                     as="a"
-                    href={item.href}
                     aria-current={item.current ? "page" : undefined}
                     onClick={() => setSelectedNav(item.name)}
                     className={classNames(
@@ -274,7 +292,9 @@ export default function Dashboard() {
             {selectedNav === "Collections" && (
               <ProductsCollection collections={collections} />
             )}
-            {selectedNav === "My List" && <ProductsMyList user={user} />}
+            {selectedNav === "My List" && (
+              <ProductsMyList user={user} setUser={setUser} />
+            )}
             {selectedNav === "Profile" && (
               <Profile user={user} setUser={setUser} />
             )}
@@ -284,7 +304,7 @@ export default function Dashboard() {
                   htmlFor="creation"
                   className="text-base font-semibold leading-7 text-gray-900"
                 >
-                  Creation Type
+                  Select
                 </label>
                 <select
                   id="creation"
@@ -296,9 +316,26 @@ export default function Dashboard() {
                   <option value="Product">Product</option>
                   <option value="Collection">Collection</option>
                 </select>
-                {creationType === "Collection" && <CollectionForm />}
+                {creationType === "Collection" && (
+                  <>
+                    <CollectionForm
+                      collections={collections}
+                      setCollections={setCollections}
+                    />
+                    <DeleteCollection
+                      collections={collections}
+                      setCollections={setCollections}
+                    />
+                  </>
+                )}
                 {creationType === "Product" && (
-                  <ProductForm collections={collections} />
+                  <>
+                    <ProductForm collections={collections} />
+                    <DeleteProduct
+                      products={products}
+                      setProducts={setProducts}
+                    />
+                  </>
                 )}
               </>
             )}

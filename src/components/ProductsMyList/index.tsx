@@ -5,7 +5,7 @@ import EmptyState from "../EmptyState";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 
-export default function ProductsMyList({ user }: any) {
+export default function ProductsMyList({ user, setUser }: any) {
   const [products, setProducts] = useState<any>([]);
 
   useEffect(() => {
@@ -14,12 +14,13 @@ export default function ProductsMyList({ user }: any) {
   }, [user.products]);
 
   const removeFromList = async (productId: number) => {
-    console.log(productId)
     // setLoading(true);
     try {
       const response = await api.delete(`/userProducts/${user.id}/${productId}`);
       if (response.statusText === "OK") {
         toast.success("Produto removido de sua lista!");
+        console.log(response.data)
+        setUser(response.data)
       }
     } catch (error: any) {
       toast.error(`Erro ao remover produto: ${error.response.data.message}`);

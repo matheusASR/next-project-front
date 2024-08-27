@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import EmptyState from "../EmptyState";
 import { api } from "@/services/api";
 
-export default function ProductsList({ user, collectionId, products }: any) {
+export default function ProductsList({ user, setUser, collectionId, products }: any) {
   const addToList = async (productId: number) => {
     console.log(productId)
     // setLoading(true);
@@ -12,6 +12,8 @@ export default function ProductsList({ user, collectionId, products }: any) {
       const response = await api.post(`/userProducts/${user.id}/${productId}`);
       if (response.statusText === "OK") {
         toast.success("Produto adicionado à sua lista!");
+        console.log(response.data)
+        setUser(response.data)
       }
     } catch (error: any) {
       toast.error(`Erro ao adicionar produto: ${error.response.data.message}`);

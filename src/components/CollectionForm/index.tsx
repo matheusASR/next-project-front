@@ -19,12 +19,12 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PhotoIcon } from "@heroicons/react/24/solid";
 import { schema } from "./addCollectionSchema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { RotatingLines } from "react-loader-spinner";
 
-export default function CollectionForm() {
+export default function CollectionForm({ collections, setCollections }: any) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const {
@@ -45,6 +45,7 @@ export default function CollectionForm() {
         toast.success("Coleção criada com sucesso");
       }
       reset();
+      setCollections([...collections, response.data]);
     } catch (error: any) {
       toast.error(`Erro ao criar coleção: ${error.response.data.message}`);
     } finally {

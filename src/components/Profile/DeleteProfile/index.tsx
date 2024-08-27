@@ -1,17 +1,32 @@
 "use client";
 
 import AlertModal from "@/components/AlertModal";
+import { api } from "@/services/api";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function DeleteProfile({ user }: any) {
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter()
 
   const handleModalDeleteAccount = () => {
     setShowModal(true);
   };
 
-  const handleDeleteAccount = () => {
-    console.log("Account delected");
+  const handleDeleteAccount = async () => {
+    // setLoading(true);
+    try {
+      const response = await api.delete(`/users/${user.id}`);
+      if (response.status === 204) {
+        toast.success("Usuário deletado com sucesso!");
+        router.push("/")
+      }
+    } catch (error: any) {
+      toast.error(`Erro ao deletar usuário: ${error.response.data.message}`);
+    } finally {
+    //   setLoading(false);
+    }
   };
 
   return (
