@@ -8,7 +8,7 @@ export default function HeroSection() {
           <div className="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center">
             <div className="relative w-full max-w-xl lg:shrink-0 xl:max-w-2xl">
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                We’re changing the way people connect.
+                We’re changing the way people learn.
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600 sm:max-w-md lg:max-w-none">
                 Cupidatat minim id magna ipsum sint dolor qui. Sunt sit in quis

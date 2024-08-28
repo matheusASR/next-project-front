@@ -10,7 +10,6 @@ export default function ProductsMyList({ user, setUser }: any) {
 
   useEffect(() => {
     setProducts(user.products);
-    console.log(user.products)
   }, [user.products]);
 
   const removeFromList = async (productId: number) => {
@@ -19,7 +18,6 @@ export default function ProductsMyList({ user, setUser }: any) {
       const response = await api.delete(`/userProducts/${user.id}/${productId}`);
       if (response.statusText === "OK") {
         toast.success("Produto removido de sua lista!");
-        console.log(response.data)
         setUser(response.data)
       }
     } catch (error: any) {

@@ -3,10 +3,10 @@
 import HeaderSection from "@/components/HeaderSection";
 import Loading from "@/components/Loading";
 import ProductsList from "@/components/ProductsList";
-import ProductsListAdmin from "@/components/ProductsListAdmin";
 import { api } from "@/services/api";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function CollectionPage() {
   const [user, setUser] = useState<any>({});
@@ -43,7 +43,6 @@ export default function CollectionPage() {
           },
         });
         if (response.status === 200) {
-          console.log(response.data);
           setUser(response.data);
         }
       } catch (error: any) {
@@ -65,10 +64,9 @@ export default function CollectionPage() {
         const response = await api.get(`/collections/${cleanCollectionId}`);
         if (response.statusText === "OK") {
           setCollection(response.data);
-          console.log(response.data.products);
         }
       } catch (error: any) {
-        console.log(`Erro ao obter coleção: ${error.response.data.message}`);
+        toast.error(`Erro ao obter coleção: ${error.response.data.message}`);
       }
     };
 
@@ -87,23 +85,12 @@ export default function CollectionPage() {
             title={collection.name}
             description={collection.description}
           />
-          {user.admin ? (
-            <>
-              <ProductsListAdmin
-                collectionId={cleanCollectionId}
-                products={collection.products}
-              />
-            </>
-          ) : (
-            <>
-              <ProductsList
-                user={user}
-                setUser={setUser}
-                collectionId={cleanCollectionId}
-                products={collection.products}
-              />
-            </>
-          )}
+          <ProductsList
+            user={user}
+            setUser={setUser}
+            collectionId={cleanCollectionId}
+            products={collection.products}
+          />
         </>
       )}
     </>

@@ -5,6 +5,7 @@ import ProductView from "@/components/ProductView";
 import { api } from "@/services/api";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function ProductsCollectionPage() {
   const [product, setProduct] = useState<any>({});
@@ -22,7 +23,7 @@ export default function ProductsCollectionPage() {
           setProduct(response.data);
         }
       } catch (error: any) {
-        console.log(`Erro ao obter produto: ${error.response.data.message}`);
+        toast.error(`Erro ao obter produto: ${error.response.data.message}`);
       }
     };
 

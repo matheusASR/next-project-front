@@ -1,6 +1,5 @@
 "use client";
-import ProductsCollection from "@/components/ProductsCollection";
-import ProductsMyList from "@/components/ProductsMyList";
+
 import AlertModal from "@/components/AlertModal";
 import { useEffect, useState } from "react";
 import {
@@ -13,34 +12,25 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import Profile from "@/components/Profile";
 import { api } from "@/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Loading from "@/components/Loading";
+import CollectionsAdmin from "@/components/CollectionsAdmin";
+import ProductsAdmin from "@/components/ProductsAdmin";
+import UsersAdmin from "@/components/UsersAdmin";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
 }
 
-function getInitials({
-  firstName,
-  lastName,
-}: {
-  firstName?: string;
-  lastName?: string;
-}): string {
-  const firstInitial = firstName?.charAt(0).toUpperCase() || "";
-  const lastInitial = lastName?.charAt(0).toUpperCase() || "";
-  return firstInitial + lastInitial;
-}
-
-export default function Dashboard() {
+export default function Admin() {
   const router = useRouter();
   const [selectedNav, setSelectedNav] = useState("Collections");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [user, setUser] = useState<any>({});
   const [collections, setCollections] = useState<any>([]);
+  const [products, setProducts] = useState<any>([]);
+  const [users, setUsers] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -53,9 +43,8 @@ export default function Dashboard() {
           },
         });
         if (response.status === 200) {
-          setUser(response.data);
-          if (response.data.admin) {
-            router.push("/dashboard/admin")
+          if (!response.data.admin) {
+            router.push("/dashboard");
           }
         }
       } catch (error: any) {
@@ -88,13 +77,45 @@ export default function Dashboard() {
       }
     };
 
+    const getProducts = async () => {
+      try {
+        const response = await api.get("/products", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.status === 200) {
+          setProducts(response.data);
+        }
+      } catch (error: any) {
+        console.error("Failed to get products", error);
+      }
+    };
+
+    const getUsers = async () => {
+      try {
+        const response = await api.get("/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.status === 200) {
+          setUsers(response.data);
+        }
+      } catch (error: any) {
+        console.error("Failed to get users", error);
+      }
+    };
+
     if (token) {
       getCollections();
+      getProducts();
+      getUsers();
     }
 
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 4000);
+    }, 2000);
 
     window.addEventListener("load", () => {
       setIsLoading(false);
@@ -105,8 +126,8 @@ export default function Dashboard() {
 
   const navigation = [
     { name: "Collections", current: true },
-    { name: "My List", current: false },
-    { name: "Profile", current: false },
+    { name: "Products", current: false },
+    { name: "Users", current: false },
   ];
 
   const signOut = () => {
@@ -162,7 +183,7 @@ export default function Dashboard() {
                           <span className="sr-only">Open user menu</span>
                           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-500">
                             <span className="font-medium leading-none text-white">
-                              {getInitials(user)}
+                              AD
                             </span>
                           </span>
                         </MenuButton>
@@ -221,21 +242,6 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="border-t border-gray-700 pb-3 pt-4">
-                <div className="flex items-center px-5">
-                  <div className="flex-shrink-0">
-                    <span className="font-medium leading-none text-white">
-                      {getInitials(user)}
-                    </span>
-                  </div>
-                  <div className="ml-3">
-                    <div className="text-base font-medium text-white">
-                      {user.name}
-                    </div>
-                    <div className="text-sm font-medium text-gray-400">
-                      {user.email}
-                    </div>
-                  </div>
-                </div>
                 <div className="mt-3 space-y-1 px-2">
                   <DisclosureButton
                     key="Sign out"
@@ -252,13 +258,16 @@ export default function Dashboard() {
 
           <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {selectedNav === "Collections" && (
-              <ProductsCollection collections={collections} />
+              <CollectionsAdmin
+                collections={collections}
+                setCollections={setCollections}
+              />
             )}
-            {selectedNav === "My List" && (
-              <ProductsMyList user={user} setUser={setUser} />
+            {selectedNav === "Products" && (
+              <ProductsAdmin products={products} setProducts={setProducts} />
             )}
-            {selectedNav === "Profile" && (
-              <Profile user={user} setUser={setUser} />
+            {selectedNav === "Users" && (
+              <UsersAdmin users={users} setUsers={setUsers} />
             )}
           </div>
 

@@ -6,13 +6,11 @@ import { api } from "@/services/api";
 
 export default function ProductsList({ user, setUser, collectionId, products }: any) {
   const addToList = async (productId: number) => {
-    console.log(productId)
     // setLoading(true);
     try {
       const response = await api.post(`/userProducts/${user.id}/${productId}`);
       if (response.statusText === "OK") {
         toast.success("Produto adicionado à sua lista!");
-        console.log(response.data)
         setUser(response.data)
       }
     } catch (error: any) {
